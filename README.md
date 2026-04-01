@@ -54,7 +54,7 @@ Este projeto implementa um `DocumentStore` personalizado para o **Haystack** que
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/<seu-usuario>/iris-haystack-documentstore.git
+git clone https://github.com/pedrohenrique-sc/QA-Pipeline-Haystack.git
 cd iris-haystack-documentstore
 ```
 
