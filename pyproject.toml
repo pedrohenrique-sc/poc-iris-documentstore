@@ -160,3 +160,17 @@ markers = [
     "integration: integration tests",
 ]
 addopts = ["--import-mode=importlib"]
+
+[tool.hatch.envs.example]
+dependencies = [
+    "sentence-transformers",
+]
+
+#.env for example iris
+[tool.hatch.envs.example.env-vars]
+IRIS_CONNECTION_STRING = "localhost:1972/USER"
+IRIS_USERNAME = "_system"
+IRIS_PASSWORD = "SYS"
+
+[tool.hatch.envs.example.scripts]
+run = "python rag_pipeline.py"
