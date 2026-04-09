@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
@@ -46,11 +46,7 @@ Issues = "https://github.com/your-org/example-haystack/issues"
 Source = "https://github.com/your-org/example-haystack"
 
 [tool.hatch.version]
-source = "vcs"
-tag-pattern = "v(?P<version>.*)"
-
-[tool.hatch.version.raw-options]
-git_describe_command = 'git describe --tags --match="v[0-9]*"'
+path = "intersystems_iris_haystack/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/haystack_integrations"]
