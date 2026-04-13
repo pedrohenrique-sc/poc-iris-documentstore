@@ -3,16 +3,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from pathlib import Path
 import pytest
 from haystack.utils import Secret
 from haystack_integrations.document_stores.intersystems_iris import IRISDocumentStore
+from dotenv import load_dotenv
+
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 @pytest.fixture()
 def document_store():
     store = IRISDocumentStore(
         connection_string=Secret.from_token(os.getenv("IRIS_CONNECTION_STRING", "localhost:1972/USER")),
         username=Secret.from_token(os.getenv("IRIS_USERNAME", "_system")),
-        password=Secret.from_token(os.getenv("IRIS_PASSWORD", "SYS)")),
+        password=Secret.from_token(os.getenv("IRIS_PASSWORD", "SYS")),
         table_name="HaystackTest768", 
         embedding_dim=768,
     )
