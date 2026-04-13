@@ -18,6 +18,24 @@ Prerequisites:
     export IRIS_USERNAME="_system"
     export IRIS_PASSWORD="SYS"
 """
+import os
+import sys
+from pathlib import Path
+from dotenv import load_dotenv
+
+env_path = Path(__file__).parent.parent / ".env"
+load = load_dotenv(dotenv_path=env_path)
+
+print("--- ENVIRONMENT DEBUG ---")
+print(f".env file found? {load}")
+print(f"STRING: {os.environ.get('IRIS_CONNECTION_STRING')}")
+print(f"USER:   {os.environ.get('IRIS_USERNAME')}")
+print(f"PASS:   {'*** (Hidden)' if os.environ.get('IRIS_PASSWORD') else 'Empty!'}")
+print("-------------------------\n")
+
+if not os.environ.get("IRIS_CONNECTION_STRING"):
+    print("Critical Error: Environment variables were not loaded.")
+    sys.exit(1)
 
 from haystack import Document, Pipeline
 from haystack.components.embedders import (
@@ -100,7 +118,7 @@ for query in [
     "what is RAG with LLMs?",
 ]:
     result = query_pipeline.run({"embedder": {"text": query}})
-    print(f"\n🔍 '{query}'")
+    print(f"\n '{query}'")
     for i, doc in enumerate(result["retriever"]["documents"], 1):
         print(f"  {i}. [{doc.score:.4f}] {doc.content[:70]}...")
 
@@ -119,18 +137,18 @@ for query in ["database SQL JSON", "pipeline components"]:
         print(f"  {i}. [{doc.score:.4f}] {doc.content[:70]}...")
 
 # ---------------------------------------------------------------------------
-# 5. Filters — legacy format
+# 5. Filters — Simple Explicit Format
 # ---------------------------------------------------------------------------
 print("\n" + "=" * 60)
-print("FILTERS — LEGACY FORMAT")
+print("FILTERS — SIMPLE EXPLICIT FORMAT")
 print("=" * 60)
 
-print("\ncategory = 'database':")
-for doc in store.filter_documents({"category": "database"}):
+print("\ncategory == 'database':")
+for doc in store.filter_documents({"field": "meta.category", "operator": "==", "value": "database"}):
     print(f"  - {doc.content[:70]}...")
 
-print("\nyear = 2023:")
-for doc in store.filter_documents({"year": 2023}):
+print("\nyear == 2023:")
+for doc in store.filter_documents({"field": "meta.year", "operator": "==", "value": 2023}):
     print(f"  - {doc.content[:70]}...")
 
 # ---------------------------------------------------------------------------
@@ -173,7 +191,9 @@ emb_result = text_embedder.run(text="features of the platform")
 emb = emb_result["embedding"]
 
 filtered = store._embedding_retrieval(
-    query_embedding=emb, top_k=3, filters={"category": "database"}
+    query_embedding=emb, 
+    top_k=3, 
+    filters={"field": "meta.category", "operator": "==", "value": "database"}
 )
 for i, doc in enumerate(filtered, 1):
     print(f"  {i}. [{doc.score:.4f}] {doc.content[:70]}...")
