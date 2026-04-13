@@ -40,10 +40,9 @@ dependencies = [
 ]
 
 [project.urls]
-# TODO: Replace with your repository URL
-Documentation = "https://github.com/your-org/example-haystack#readme"
-Issues = "https://github.com/your-org/example-haystack/issues"
-Source = "https://github.com/your-org/example-haystack"
+Documentation = "https://github.com/s-c-ai/iris-haystack"
+Issues = "https://github.com/s-c-ai/iris-haystack/issues"
+Source = "https://github.com/s-c-ai/iris-haystack"
 
 [tool.hatch.version]
 path = "src/haystack_integrations/__about__.py"
@@ -58,6 +57,7 @@ dependencies = ["ruff"]
 [tool.hatch.envs.default.scripts]
 fmt = "ruff check --fix {args:.} && ruff format {args:.}"
 fmt-check = "ruff check {args:.} && ruff format --check {args:.}"
+type-check = "mypy src/haystack_integrations tests"
 
 [tool.hatch.envs.test]
 dependencies = [
