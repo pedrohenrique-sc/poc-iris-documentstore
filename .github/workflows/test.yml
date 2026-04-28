@@ -48,8 +48,8 @@ jobs:
         if: matrix.python-version == '3.10' && runner.os == 'Linux'
         run: hatch run fmt-check
 
-      - name: Run tests)
-          IRIS_CONNECTION_STRING: "127.0.0.1:1972/USER"
-          IRIS_USERNAME: "SuperUser"
-          IRIS_PASSWORD: "SYS"
+      - name: Run tests
+        IRIS_CONNECTION_STRING: "127.0.0.1:1972/USER"
+        IRIS_USERNAME: "SuperUser"
+        IRIS_PASSWORD: "SYS"
         run: hatch run test:all
