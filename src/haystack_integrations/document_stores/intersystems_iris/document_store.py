@@ -703,8 +703,8 @@ class IRISDocumentStore:
     def _get_by_id(self, doc_id: str, cur: Any = None) -> Any:  # noqa: ANN401
         _cur = cur or self._cursor()
         _cur.execute(
-            f"SELECT id FROM SQLUser.{self.table_name} WHERE id = ?",
-            [doc_id],  # noqa: S608
+            f"SELECT id FROM SQLUser.{self.table_name} WHERE id = ?",  # noqa: S608
+            [doc_id],
         )
         return _cur.fetchone()
 
