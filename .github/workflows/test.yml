@@ -34,6 +34,12 @@ jobs:
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ matrix.python-version }}
+          
+      - name: Start InterSystems IRIS via Docker
+        run: |
+          docker run -d -p 1972:1972 -e IRIS_PASSWORD=SYS -e IRIS_USERNAME=SuperUser intersystemsdc/iris-community:latest
+          echo "Aguardando o InterSystems IRIS inicializar..."
+          sleep 25 
 
       - name: Install Hatch
         run: pip install hatch
@@ -43,4 +49,6 @@ jobs:
         run: hatch run fmt-check
 
       - name: Run tests
+        env:
+          IRIS_CONNECTION_STRING: "iris://SuperUser:SYS@localhost:1972/USER"
         run: hatch run test:all

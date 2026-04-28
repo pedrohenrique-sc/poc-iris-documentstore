@@ -21,6 +21,19 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
+from haystack import Document, Pipeline
+from haystack.components.embedders import (
+    SentenceTransformersDocumentEmbedder,
+    SentenceTransformersTextEmbedder,
+)
+from haystack.components.writers import DocumentWriter
+from haystack.document_stores.types import DuplicatePolicy
+
+from haystack_integrations.components.retrievers.intersystems_iris import (
+    IRISBm25Retriever,
+    IRISEmbeddingRetriever,
+)
+from haystack_integrations.document_stores.intersystems_iris import IRISDocumentStore
 
 env_path = Path(__file__).parent.parent / ".env"
 load = load_dotenv(dotenv_path=env_path)
@@ -35,20 +48,6 @@ print("-------------------------\n")
 if not os.environ.get("IRIS_CONNECTION_STRING"):
     print("Critical Error: Environment variables were not loaded.")
     sys.exit(1)
-
-from haystack import Document, Pipeline
-from haystack.components.embedders import (
-    SentenceTransformersDocumentEmbedder,
-    SentenceTransformersTextEmbedder,
-)
-from haystack.components.writers import DocumentWriter
-from haystack.document_stores.types import DuplicatePolicy
-
-from haystack_integrations.components.retrievers.intersystems_iris import (
-    IRISBm25Retriever,
-    IRISEmbeddingRetriever,
-)
-from haystack_integrations.document_stores.intersystems_iris import IRISDocumentStore
 
 MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 

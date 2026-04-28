@@ -48,7 +48,7 @@ class TestFilterDocuments(FilterDocumentsTest):
         rec_sorted = sorted(received, key=lambda d: d.id)
         exp_sorted = sorted(expected, key=lambda d: d.id)
 
-        for r, e in zip(rec_sorted, exp_sorted):
+        for r, e in zip(rec_sorted, exp_sorted, strict=True):
             assert r.id == e.id
             assert r.content == e.content
             assert r.meta == e.meta

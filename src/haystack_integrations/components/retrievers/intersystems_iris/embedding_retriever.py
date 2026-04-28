@@ -115,6 +115,7 @@ class IRISEmbeddingRetriever:
         return {"documents": docs}
 
     def to_dict(self) -> dict[str, Any]:
+        """Serializes the component to a dictionary."""
         return default_to_dict(
             self,
             document_store=self.document_store.to_dict(),
@@ -125,6 +126,7 @@ class IRISEmbeddingRetriever:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "IRISEmbeddingRetriever":
+        """Deserializes the component from a dictionary."""
         data["init_parameters"]["document_store"] = IRISDocumentStore.from_dict(
             data["init_parameters"]["document_store"]
         )

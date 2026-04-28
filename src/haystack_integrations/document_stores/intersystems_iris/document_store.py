@@ -37,7 +37,7 @@ class _BM25Index:
     Parameters
     ----------
     k1:
-        Term frequency saturation parameter (typical: 1.2–2.0).
+        Term frequency saturation parameter (typical: 1.2-2.0).
     b:
         Length normalization parameter (0.0 = none, 1.0 = full).
 
@@ -83,7 +83,7 @@ class _BM25Index:
         if not self._docs:
             return []
         query_tokens = self._tokenize(text)
-        N = len(self._docs)
+        n = len(self._docs)
         scores: list[float] = []
         for i, _ in enumerate(self._docs):
             tf_doc = self._tf[i]
@@ -94,7 +94,7 @@ class _BM25Index:
                 df = self._df.get(token, 0)
                 if df == 0:
                     continue
-                idf = math.log((N - df + 0.5) / (df + 0.5) + 1)
+                idf = math.log((n - df + 0.5) / (df + 0.5) + 1)
                 score += idf * tf * (self.k1 + 1) / (
                     tf + self.k1 * (1 - self.b + self.b * dl / self._avg_dl)
                 )
@@ -178,9 +178,9 @@ class IRISDocumentStore:
         Number of dimensions of the embedding vectors.  Must match the
         embedding model used at indexing time.
     bm25_k1:
-        BM25 term-frequency saturation parameter (typical: 1.2–2.0).
+        BM25 term-frequency saturation parameter (typical: 1.2-2.0).
     bm25_b:
-        BM25 length-normalization parameter (0.0–1.0).
+        BM25 length-normalization parameter (0.0-1.0).
     recreate_table:
         Drop and re-create the table on initialization.
         **Use with caution — all data will be lost.**
@@ -194,18 +194,18 @@ class IRISDocumentStore:
     def __init__(
         self,
         *,
-        connection_string: Secret = Secret.from_env_var("IRIS_CONNECTION_STRING"),
-        username: Secret = Secret.from_env_var("IRIS_USERNAME"),
-        password: Secret = Secret.from_env_var("IRIS_PASSWORD"),
+        connection_string: Secret | None = None,
+        username: Secret | None = None,
+        password: Secret | None = None,
         table_name: str = "HaystackDocuments",
         embedding_dim: int = 384,
         bm25_k1: float = 1.5,
         bm25_b: float = 0.75,
         recreate_table: bool = False,
     ) -> None:
-        self.connection_string = connection_string
-        self.username = username
-        self.password = password
+        self.connection_string = connection_string or Secret.from_env_var("IRIS_CONNECTION_STRING")
+        self.username = username or Secret.from_env_var("IRIS_USERNAME")
+        self.password = password or Secret.from_env_var("IRIS_PASSWORD")
         self.table_name = table_name
         self.embedding_dim = embedding_dim
         self.bm25_k1 = bm25_k1
@@ -253,11 +253,11 @@ class IRISDocumentStore:
                     attempt, _MAX_RETRIES, exc, wait,
                 )
                 time.sleep(wait)
-
-        raise ConnectionError(
+        msg = (
             f"Could not connect to IRIS at '{conn_str}' after "
             f"{_MAX_RETRIES} attempts. Last error: {last_exc}"
-        ) from last_exc
+        )
+        raise ConnectionError(msg) from last_exc
 
     def _ensure_connection(self) -> None:
         """Ping IRIS with ``SELECT 1`` and reconnect if the connection is lost."""
@@ -269,7 +269,7 @@ class IRISDocumentStore:
             logger.warning("IRIS connection lost — reconnecting...")
             self._connect_with_retry()
 
-    def _cursor(self):
+    def _cursor(self) -> Any: # noqa: ANN401
         self._ensure_connection()
         return self._conn.cursor()
 
@@ -334,7 +334,7 @@ class IRISDocumentStore:
         """
         cur = self._cursor()
         try:
-            cur.execute(f"SELECT COUNT(*) FROM SQLUser.{self.table_name}")
+            cur.execute(f"SELECT COUNT(*) FROM SQLUser.{self.table_name}") # noqa: S608
             row = cur.fetchone()
             return int(row[0]) if row else 0
         finally:
@@ -391,7 +391,7 @@ class IRISDocumentStore:
         cur = self._cursor()
         try:
             cur.execute(
-                f"SELECT id, content, meta, score "
+                f"SELECT id, content, meta, score " # noqa: S608
                 f"FROM SQLUser.{self.table_name}"
             )
             rows = cur.fetchall()
@@ -458,21 +458,21 @@ class IRISDocumentStore:
         try:
             for doc in documents:
                 if not isinstance(doc, Document):
-                    raise ValueError(
-                        f"Expected a Document object, got {type(doc).__name__!r}."
-                    )
+                    msg = f"Expected a Document object, got {type(doc).__name__!r}."
+                    raise ValueError(msg)
                 existing = self._get_by_id(doc.id, cur)
                 if existing:
                     if policy == DuplicatePolicy.FAIL:
-                        raise DuplicateDocumentError(
+                        msg = (
                             f"Document with id '{doc.id}' already exists. "
                             "Use DuplicatePolicy.SKIP or OVERWRITE."
                         )
+                        raise DuplicateDocumentError(msg)
                     if policy == DuplicatePolicy.SKIP:
                         logger.debug("Skipping duplicate document: %s", doc.id)
                         continue
                     cur.execute(
-                        f"DELETE FROM SQLUser.{self.table_name} WHERE id = ?",
+                        f"DELETE FROM SQLUser.{self.table_name} WHERE id = ?", # noqa: S608
                         [doc.id],
                     )
 
@@ -481,14 +481,14 @@ class IRISDocumentStore:
 
                 if emb_str:
                     cur.execute(
-                        f"INSERT INTO SQLUser.{self.table_name} "
+                        f"INSERT INTO SQLUser.{self.table_name} " # noqa: S608
                         f"(id, content, meta, score, embedding) "
                         f"VALUES (?, ?, ?, ?, TO_VECTOR(?, DOUBLE))",
                         [doc.id, doc.content or "", meta_str, doc.score, emb_str],
                     )
                 else:
                     cur.execute(
-                        f"INSERT INTO SQLUser.{self.table_name} "
+                        f"INSERT INTO SQLUser.{self.table_name} " # noqa: S608
                         f"(id, content, meta, score) VALUES (?, ?, ?, ?)",
                         [doc.id, doc.content or "", meta_str, doc.score],
                     )
@@ -525,7 +525,7 @@ class IRISDocumentStore:
         cur = self._cursor()
         try:
             cur.execute(
-                f"DELETE FROM SQLUser.{self.table_name} "
+                f"DELETE FROM SQLUser.{self.table_name} " # noqa: S608
                 f"WHERE id IN ({placeholders})",
                 document_ids,
             )
@@ -574,11 +574,12 @@ class IRISDocumentStore:
         """
         emb_str = self._embedding_to_str(query_embedding)
         if not emb_str:
-            raise ValueError("query_embedding cannot be None or empty.")
+            msg_val = "query_embedding cannot be None or empty."
+            raise ValueError(msg_val)
 
         fetch_k = top_k * 4 if filters else top_k
         sql = (
-            f"SELECT TOP ? id, content, meta, score, "
+            f"SELECT TOP ? id, content, meta, score, " # noqa: S608
             f"VECTOR_COSINE(embedding, TO_VECTOR(?, DOUBLE)) AS similarity "
             f"FROM SQLUser.{self.table_name} "
             f"WHERE embedding IS NOT NULL "
@@ -705,25 +706,26 @@ class IRISDocumentStore:
     # Helpers
     # ------------------------------------------------------------------
 
-    def _get_by_id(self, doc_id: str, cur=None):
+    def _get_by_id(self, doc_id: str, cur: Any = None) -> Any: # noqa: ANN401
         _cur = cur or self._cursor()
         _cur.execute(
-            f"SELECT id FROM SQLUser.{self.table_name} WHERE id = ?", [doc_id]
+            f"SELECT id FROM SQLUser.{self.table_name} WHERE id = ?", [doc_id] # noqa: S608
         )
         return _cur.fetchone()
 
     @staticmethod
     def _embedding_to_str(embedding: list[float] | None) -> str | None:
         """
-        Convert a list of floats to the string format expected by
-        ``TO_VECTOR(?, DOUBLE)`` in IRIS: ``[v1,v2,...,vN]``.
+        Convert a list of floats to the string format expected by IRIS.
+
+        It formats as expected by ``TO_VECTOR(?, DOUBLE)`` in IRIS: ``[v1,v2,...,vN]``.
         """
         if not embedding:
             return None
         return "[" + ",".join(f"{v:.8f}" for v in embedding) + "]"
 
     @staticmethod
-    def _row_to_document(row) -> Document:
+    def _row_to_document(row: Any) -> Document: # noqa: ANN401
         """
         Convert a DB-API row (id, content, meta, score, ...) to a Document.
 
@@ -747,14 +749,14 @@ class IRISDocumentStore:
         if self._conn:
             try:
                 self._conn.close()
-            except Exception:
+            except Exception: # noqa: S110
                 pass
             logger.debug("IRIS connection closed.")
 
     def __enter__(self) -> IRISDocumentStore:
         return self
 
-    def __exit__(self, *_: Any) -> None:
+    def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
         self.close()
 
     def __repr__(self) -> str:
