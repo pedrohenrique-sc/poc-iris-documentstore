@@ -15,7 +15,7 @@ def main():
     load_dotenv()
     
     print("--- Phase 2: RAG Chatbot Demo ---")
-    store = IRISDocumentStore(table_name="Mixed_POC_Docs", embedding_dim=384)
+    store = IRISDocumentStore(table_name="POC_Docs", embedding_dim=384)
     
     if store.count_documents() == 0:
         print("Error: The database is empty. Please run 'index_documents.py' first.")
