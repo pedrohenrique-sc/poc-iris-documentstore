@@ -134,6 +134,7 @@ ban-relative-imports = "parents"
 "tests/**/*" = ["D", "PLR2004", "S101", "TID252", "ANN"]
 # Examples can print their output and don't need type annotations
 "examples/**/*" = ["D", "T201", "ANN"]
+"examples/rag-poc/*" = ["E501", "W291"]
 
 [tool.mypy]
 install_types = true

@@ -32,7 +32,9 @@ class IRISBm25Retriever:
         pipeline = Pipeline()
         pipeline.add_component("retriever", IRISBm25Retriever(document_store=store))
 
-        result = pipeline.run({"retriever": {"query": "multimodel database", "top_k": 5}})
+        result = pipeline.run(
+            {"retriever": {"query": "multimodel database", "top_k": 5}}
+        )
         print(result["retriever"]["documents"])
 
     Parameters

@@ -27,12 +27,16 @@ class IRISEmbeddingRetriever:
         from haystack import Pipeline
         from haystack.components.embedders import SentenceTransformersTextEmbedder
         from haystack_integrations.document_stores.iris import IRISDocumentStore
-        from haystack_integrations.components.retrievers.iris import IRISEmbeddingRetriever
+        from haystack_integrations.components.retrievers.iris import (
+            IRISEmbeddingRetriever,
+        )
 
         store = IRISDocumentStore()
         pipeline = Pipeline()
         pipeline.add_component("embedder", SentenceTransformersTextEmbedder())
-        pipeline.add_component("retriever", IRISEmbeddingRetriever(document_store=store))
+        pipeline.add_component(
+            "retriever", IRISEmbeddingRetriever(document_store=store)
+        )
         pipeline.connect("embedder.embedding", "retriever.query_embedding")
 
         result = pipeline.run({"embedder": {"text": "What is IRIS?"}})

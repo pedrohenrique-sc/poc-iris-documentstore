@@ -136,6 +136,7 @@ class IRISDocumentStore:
     .. code-block:: python
 
         from haystack_integrations.document_stores.iris import IRISDocumentStore
+
         store = IRISDocumentStore()
 
     **Retrievers**
@@ -380,13 +381,15 @@ class IRISDocumentStore:
 
         Official Haystack filter with ``AND`` and ``>=``::
 
-            store.filter_documents({
-                "operator": "AND",
-                "conditions": [
-                    {"field": "meta.category", "operator": "==", "value": "db"},
-                    {"field": "meta.year",     "operator": ">=", "value": 2023},
-                ],
-            })
+            store.filter_documents(
+                {
+                    "operator": "AND",
+                    "conditions": [
+                        {"field": "meta.category", "operator": "==", "value": "db"},
+                        {"field": "meta.year", "operator": ">=", "value": 2023},
+                    ],
+                }
+            )
         """
         cur = self._cursor()
         try:
