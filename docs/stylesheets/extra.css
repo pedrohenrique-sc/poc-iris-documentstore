@@ -1,0 +1,52 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   iris-haystack — MkDocs Material custom styles
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Primary color override — IRIS teal */
+:root {
+  --md-primary-fg-color:        #00838F;
+  --md-primary-fg-color--light: #4FB3BF;
+  --md-primary-fg-color--dark:  #005662;
+  --md-accent-fg-color:         #E65100;
+}
+
+/* Widen the content area slightly */
+.md-grid {
+  max-width: 1280px;
+}
+
+/* Style the admonition for "tip" with IRIS color */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: #00838F;
+}
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(0, 131, 143, 0.12);
+}
+.md-typeset .tip > .admonition-title::before,
+.md-typeset .tip > summary::before {
+  color: #00838F;
+}
+
+/* API reference — method signature block */
+.doc-signature {
+  background: var(--md-code-bg-color);
+  border-left: 3px solid var(--md-primary-fg-color);
+  padding: 0.5em 1em;
+  font-family: var(--md-code-font-family);
+  font-size: 0.85em;
+  overflow-x: auto;
+}
+
+/* Grid cards — equal height */
+.md-typeset .grid.cards > ol > li,
+.md-typeset .grid.cards > ul > li {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Home page hero spacing */
+.md-typeset h1 + .grid.cards {
+  margin-top: 1.5rem;
+}

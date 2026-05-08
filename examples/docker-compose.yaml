@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  iris:
+    image: intersystemsdc/iris-community:latest
+    container_name: iris-haystack
+    ports:
+      - "1972:1972"
+      - "52773:52773"
+    environment:
+      - IRIS_PASSWORD=demo
+      - IRIS_USERNAME=demo
+    volumes:
+      - iris-data:/usr/irissys/mgr
+    healthcheck:
+      test: ["CMD", "iris", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  iris-data:

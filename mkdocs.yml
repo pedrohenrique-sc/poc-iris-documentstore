@@ -1,0 +1,248 @@
+site_name: iris-haystack
+site_url: https://s-c-ai.github.io/iris-haystack/
+site_description: >-
+  A production-ready Haystack 2.x DocumentStore backed by InterSystems IRIS —
+  native vector search, Okapi BM25, and full Haystack filter protocol support.
+site_author: ScientifiCloud
+
+repo_url: https://github.com/s-c-ai/iris-haystack
+repo_name: s-c-ai/iris-haystack
+edit_uri: edit/main/docs/
+
+copyright: >-
+  Copyright &copy; 2026 ScientifiCloud
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Theme — Material for MkDocs
+# ─────────────────────────────────────────────────────────────────────────────
+theme:
+  name: material
+  language: en
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+
+  features:
+    # Navigation
+    - navigation.instant          # SPA-like page transitions
+    - navigation.instant.progress # Progress bar on slow connections
+    - navigation.tracking         # URL hash reflects current section
+    - navigation.tabs             # Top-level tabs
+    - navigation.tabs.sticky      # Tabs stay visible while scrolling
+    - navigation.sections         # Expand sections in left sidebar
+    - navigation.expand           # Auto-expand navigation tree
+    - navigation.indexes          # Section index pages (index.md)
+    - navigation.top              # Back-to-top button
+    - navigation.footer           # Previous/next links in footer
+
+    # Search
+    - search.suggest              # Autocomplete suggestions
+    - search.highlight            # Highlight search terms in results
+    - search.share                # Shareable search URLs
+
+    # Content
+    - content.tabs.link           # Linked content tabs (sync across page)
+    - content.code.copy           # Copy button on code blocks
+    - content.code.annotate       # Code annotations (# (1))
+    - content.tooltips            # Inline tooltips on abbreviations
+    - content.action.edit         # Edit page button (requires edit_uri)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Navigation structure
+# ─────────────────────────────────────────────────────────────────────────────
+nav:
+  - Home: index.md
+
+  - Getting Started:
+    - getting-started/index.md
+    - Prerequisites: getting-started/prerequisites.md
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Docker Setup: getting-started/docker.md
+
+  - User Guide:
+    - user-guide/index.md
+    - IRISDocumentStore: user-guide/document-store.md
+    - Embedding Retriever: user-guide/embedding-retriever.md
+    - BM25 Retriever: user-guide/bm25-retriever.md
+    - Metadata Filtering: user-guide/filtering.md
+    - Pipeline Serialization: user-guide/serialization.md
+    - Credentials & Secrets: user-guide/credentials.md
+
+  - API Reference:
+    - api/index.md
+    - IRISDocumentStore: api/document-store.md
+    - IRISEmbeddingRetriever: api/embedding-retriever.md
+    - IRISBm25Retriever: api/bm25-retriever.md
+
+  - Development:
+    - development/index.md
+    - Project Setup (hatch): development/hatch.md
+    - Running Tests: development/testing.md
+    - Code Style & Linting: development/code-style.md
+    - Architecture: development/architecture.md
+
+  - Contributing:
+    - contributing/index.md
+    - How to Contribute: contributing/how-to-contribute.md
+    - Publishing to PyPI: contributing/pypi.md
+    - Haystack Integration PR: contributing/haystack-pr.md
+
+  - Changelog: changelog.md
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Plugins
+# ─────────────────────────────────────────────────────────────────────────────
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()/"]+|(?!\b)(?=[A-Z][a-z])'
+
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            # What to show
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_signature_annotations: true
+            show_if_no_docstring: false
+            # Members
+            members_order: source
+            inherited_members: false
+            filters:
+              - "!^_"           # hide private members
+              - "^__init__"     # but show __init__
+            # Docstring style
+            docstring_style: numpy
+            docstring_section_style: table
+            merge_init_into_class: true
+            # Extras
+            separate_signature: true
+            line_length: 80
+
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: date
+
+  - minify:
+      minify_html: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Markdown extensions
+# ─────────────────────────────────────────────────────────────────────────────
+markdown_extensions:
+  # Python Markdown built-ins
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      title: On this page
+      toc_depth: 3
+
+  # PyMdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: s-c-ai
+      repo: iris-haystack
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - docs/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Extra CSS and JavaScript
+# ─────────────────────────────────────────────────────────────────────────────
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Extra — social links, analytics, version
+# ─────────────────────────────────────────────────────────────────────────────
+extra:
+  version:
+    provider: mike              # multi-version docs support
+    default: stable
+
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/s-c-ai/iris-haystack
+      name: GitHub Repository
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/intersystems-iris-haystack/
+      name: PyPI Package
+
+  # analytics:
+  #   provider: google
+  #   property: G-XXXXXXXXXX      # replace with your GA4 ID
+
+  # consent:
+  #   title: Cookie consent
+  #   description: >-
+  #     We use cookies to recognize your repeated visits and preferences, as well
+  #     as to measure the effectiveness of our documentation and whether users
+  #     find what they're searching for.

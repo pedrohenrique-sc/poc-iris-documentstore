@@ -1,0 +1,3 @@
+# IRISEmbeddingRetriever
+
+::: haystack_integrations.components.retrievers.intersystems_iris.embedding_retriever.IRISEmbeddingRetriever

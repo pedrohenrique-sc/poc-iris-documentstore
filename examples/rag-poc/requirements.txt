@@ -1,0 +1,6 @@
+haystack-ai
+sentence-transformers
+pypdf
+python-dotenv
+streamlit
+watchdog
