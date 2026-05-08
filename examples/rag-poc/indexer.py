@@ -19,32 +19,23 @@ from haystack.document_stores.types import DuplicatePolicy
 
 from haystack_integrations.document_stores.intersystems_iris import IRISDocumentStore
 
-# Configure professional logging instead of basic prints
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 def main() -> None:
-    """Main execution function for indexing documents."""
     load_dotenv()
     logger.info("Starting Advanced Document Ingestion Process (PDFs + Manual Text)...")
 
     try:
-        # 1. Initialize Document Store
-        # recreate_table=False prevents deleting previous data on subsequent runs.
         store = IRISDocumentStore(table_name="POC_Docs", embedding_dim=384, recreate_table=False)
     except Exception as e:
         logger.error(f"Failed to connect to InterSystems IRIS: {e}")
         return
 
-    # 2. Initialize Haystack Components
     converter = PyPDFToDocument()
     splitter = DocumentSplitter(split_by="word", split_length=150, split_overlap=20)
     embedder = SentenceTransformersDocumentEmbedder(model="sentence-transformers/all-MiniLM-L6-v2")
-    
-    # DuplicatePolicy.SKIP ensures we don't re-embed and duplicate the exact same manual docs every time
     writer = DocumentWriter(document_store=store, policy=DuplicatePolicy.SKIP)
-
-    # 3. Process PDFs (if any exist in the data/ folder)
     data_dir = Path("data")
     pdf_docs = []
     
@@ -59,7 +50,6 @@ def main() -> None:
     else:
         logger.warning(f"Directory '{data_dir}' not found. Skipping PDF extraction.")
 
-    # 4. Define Manual Documents (The Examples)
     logger.info("Loading manual technical knowledge base examples...")
     manual_docs = [
         Document(
@@ -92,11 +82,7 @@ def main() -> None:
         )
     ]
 
-    # Combine both document sources into a single list
     all_docs = pdf_docs + manual_docs
-
-    # 5. Build the Embedding & Writing Pipeline
-    # We only need Embedder -> Writer here because texts are already split into Documents
     indexing_pipeline = Pipeline()
     indexing_pipeline.add_component("embedder", embedder)
     indexing_pipeline.add_component("writer", writer)
@@ -104,7 +90,6 @@ def main() -> None:
 
     logger.info(f"Embedding and indexing a total of {len(all_docs)} document chunks into IRIS...")
     
-    # 6. Execute the Pipeline
     try:
         indexing_pipeline.run({"embedder": {"documents": all_docs}})
         logger.info(f"Success! Total documents now stored in InterSystems IRIS: {store.count_documents()}")

@@ -19,11 +19,7 @@ from haystack_integrations.document_stores.intersystems_iris import IRISDocument
 from haystack_integrations.components.retrievers.intersystems_iris import IRISEmbeddingRetriever
 from haystack.components.generators import OpenAIGenerator
 
-
-# Load environment variables
 load_dotenv()
-
-# Streamlit Page Configuration
 st.set_page_config(page_title="Enterprise AI Assistant", page_icon="🤖", layout="centered")
 
 def extract_think_tags(text: str) -> tuple[str | None, str]:
@@ -31,16 +27,13 @@ def extract_think_tags(text: str) -> tuple[str | None, str]:
     Parses the LLM response to separate the <think> reasoning block from the main answer.
     Returns a tuple: (think_content, main_answer).
     """
-    # Search for everything between <think> and </think>, including line breaks (re.DOTALL)
     think_match = re.search(r'<think>(.*?)</think>', text, flags=re.DOTALL)
     
     if think_match:
         think_content = think_match.group(1).strip()
-        # Remove the <think> block from the original text to get the clean answer
         main_answer = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
         return think_content, main_answer
-    
-    # If no <think> tag is found, return None for thinking and the original text
+
     return None, text
 
 @st.cache_resource(show_spinner="Initializing AI Components...")
@@ -98,16 +91,13 @@ def main():
         st.error(f"Database Connection Error: {e}")
         st.stop()
 
-    # Initialize Chat History
     if "messages" not in st.session_state:
         st.session_state.messages = [
             {"role": "assistant", "content": "Hello! I am your AI assistant. Ask me anything about our indexed documents!"}
         ]
 
-    # Render Chat History
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
-            # If it's the assistant, we parse the message to hide the <think> tag in the history too
             if message["role"] == "assistant":
                 think_content, main_answer = extract_think_tags(message["content"])
                 
@@ -119,15 +109,11 @@ def main():
             else:
                 st.markdown(message["content"])
 
-    # User Input Handling
     if user_query := st.chat_input("Type your question here..."):
-        
-        # 1. Display User Message
         with st.chat_message("user"):
             st.markdown(user_query)
         st.session_state.messages.append({"role": "user", "content": user_query})
 
-        # 2. Process and Display AI Response
         with st.chat_message("assistant"):
             with st.spinner("Retrieving vectors from InterSystems IRIS..."):
                 try:
@@ -138,25 +124,17 @@ def main():
                     
                     raw_answer = result["llm"]["replies"][0]
                     source_documents = result.get("retriever", {}).get("documents", [])
-                    
-                    # Parse the raw answer to separate thinking from the final answer
                     think_content, main_answer = extract_think_tags(raw_answer)
                     
-                    # Display the thinking block if it exists
                     if think_content:
                         with st.expander("🧠 View reasoning process (Think)"):
                             st.markdown(think_content)
                             
-                    # Display the clean main answer
                     st.markdown(main_answer)
-                    
-                    # Display Source Evidence
                     if source_documents:
                         with st.expander("📚 View Retrieval Evidence"):
                             for i, doc in enumerate(source_documents, 1):
                                 st.info(f"**Chunk {i} (Cosine Similarity: {doc.score:.2f})**\n\n{doc.content}")
-
-                    # Save the FULL raw answer to history so it can be re-parsed if the user scrolls up
                     st.session_state.messages.append({"role": "assistant", "content": raw_answer})
                 
                 except Exception as e:
