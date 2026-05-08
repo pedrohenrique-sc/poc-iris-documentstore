@@ -70,7 +70,7 @@ If you want to add knowdlege by .pdf, create a folder named data/ in the same di
 Execute the ingestion script. This will read the PDFs, chunk the text, generate embeddings, and store them in InterSystems IRIS.
 
     ```bash
-    python index.py
+    python indexer.py
     
     Note: This script uses recreate_table=False and DuplicatePolicy.SKIP. You can run it multiple times as you add new PDFs without duplicating existing data.
     ```
